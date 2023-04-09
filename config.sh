@@ -1,7 +1,6 @@
 #!/bin/sh
 
-local_path="/home/$USER/.config"
-chezmoi_path="/home/$USER/.local/share/chezmoi/dot_config"
+CONFIG_PATH="$HOME/.config"
 
 export CONFIGS=$(cat <<END
 i3wm
@@ -26,28 +25,28 @@ CHOICE=$(echo "$CONFIGS" | grep $KEY | cut -d':' -f2)
 # Create a switch case for each config
 case $CHOICE in
     i3wm)
-        $EDITOR $local_path/i3/config
+        $EDITOR $CONFIG_PATH/i3/config
         ;;
     lf)
-        $EDITOR $chezmoi_path/lf/lfrc
+        $EDITOR $CONFIG_PATH/lf/lfrc
         ;;
     kitty)
-        $EDITOR $local_path/kitty/kitty.conf
+        $EDITOR $CONFIG_PATH/kitty/kitty.conf
         ;;
     picom)
-        $EDITOR $local_path/picom/picom.conf
+        $EDITOR $CONFIG_PATH/picom/picom.conf
         ;;
     fish)
-        $EDITOR $chezmoi_path/private_fish/config.fish
+        $EDITOR $CONFIG_PATH/private_fish/config.fish
         ;;
     mimeapps)
-        $EDITOR $chezmoi_path/mimeapps.list
+        $EDITOR $CONFIG_PATH/mimeapps.list
         ;;
     External_Drives)
         lf /media/
         ;;
     nvim)
-        lf $chezmoi_path/nvim/
+        lf $CONFIG_PATH/nvim/
         ;;
 
     *)
