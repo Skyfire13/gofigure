@@ -1,0 +1,12 @@
+########################################
+######## GOFIGURE CONFIGURATION ########
+########################################
+
+# Key = What will appear in the selection menu
+# Value = Command that will be executed
+
+# Sample commands:
+# i3wm: $EDITOR $HOME/.config/i3/config
+# kitty: $EDITOR $HOME/.config/kitty/kitty.conf
+# nvim: lf $HOME/.config/nvim
+

@@ -2,6 +2,10 @@
 # Shell script that runs commands from an interactive menu
 # Mostly used for jumping to config files
 
+# Path to config file
+GOFIGURE_OPTIONS="$HOME/.config/gofigure/gofigure.yaml"
+
+
 # Check for gum dependancy
 if ! command -v gum &> /dev/null
 then
@@ -30,12 +34,14 @@ function parse_yaml {
    }'
 }
 
-export CONFIGS=$(parse_yaml config.yaml)
+export CONFIGS=$(parse_yaml $GOFIGURE_OPTIONS)
 
 GUM_CONFIG="\
-    --header Gofigure\
-    --header.bold\
-    --header.foreground"
+    --prompt ~\
+    --prompt.bold\
+    --indicator.bold\
+    --selected-indicator.border normal\
+    --match.underline"
 
 
 # Separate the keys from their values, runs gum filter
