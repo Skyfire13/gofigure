@@ -18,7 +18,14 @@ CONFIG_PATH="$HOME/.config"
 # Regular Keys: Type
 
 STATE='CHOOSE'
-#STATE='FZF'
+
+function changeState(){
+    if [[ $STATE == "CHOOSE" ]]; then
+        STATE="FZF"
+    else
+        STATE="CHOOSE"
+    fi
+}
 
 export CONFIGS=$(
     cat <<END
@@ -33,11 +40,11 @@ nvim
 END
 )
 
-GUM_CONFIG="\
+CHOOSE_CONFIG="\
     --cursor=> \
     --item.bold"
 
-KEY=$(echo "$CONFIGS" | gum choose $GUM_CONFIG)
+KEY=$(echo "$CONFIGS" | gum choose $CHOOSE_CONFIG)
 CHOICE=$(echo "$CONFIGS" | grep $KEY)
 
 # Create a switch case for each config
