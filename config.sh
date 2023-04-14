@@ -1,80 +1,49 @@
 #!/bin/sh
+# Shell script that runs commands from an interactive menu
+# Mostly used for jumping to config files
 
-CONFIG_PATH="$HOME/.config"
+# Check for gum dependancy
+if ! command -v gum &> /dev/null
+then
+    
+    echo "Command 'gum' could not be found.
+    Please install it through your local package manager
+    or download it from 'https://github.com/charmbracelet/gum'"
+    exit
+fi
 
-# SEARCH rules
-# Enter Key: Executes
-# Esc Key: Exits
-# Ctrl + C: Exits
-# Arrow Keys: Navigate
-# HJKL: Navigate
-# /: Set STATE to FZF
-
-# FZF rules
-# Enter Key: Executes
-# Esc Key: Returns to CHOOSE
-# Ctrl + C: Exits
-# Arrow Keys: Navigate
-# Regular Keys: Type
-
-STATE='CHOOSE'
-
-function changeState(){
-    if [[ $STATE == "CHOOSE" ]]; then
-        STATE="FZF"
-    else
-        STATE="CHOOSE"
-    fi
+# YAML Parser
+function parse_yaml {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\):|\1|" \
+        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
+      }
+   }'
 }
 
-export CONFIGS=$(
-    cat <<END
-i3wm
-lf
-kitty
-picom
-fish
-mimeapps
-External_Drives
-nvim
-END
-)
+export CONFIGS=$(parse_yaml config.yaml)
 
-CHOOSE_CONFIG="\
-    --cursor=> \
-    --item.bold"
+GUM_CONFIG="\
+    --header Gofigure\
+    --header.bold\
+    --header.foreground"
 
-KEY=$(echo "$CONFIGS" | gum choose $CHOOSE_CONFIG)
-CHOICE=$(echo "$CONFIGS" | grep $KEY)
 
-# Create a switch case for each config
-case $CHOICE in
-i3wm)
-    $EDITOR $CONFIG_PATH/i3/config
-    ;;
-lf)
-    $EDITOR $CONFIG_PATH/lf/lfrc
-    ;;
-kitty)
-    $EDITOR $CONFIG_PATH/kitty/kitty.conf
-    ;;
-picom)
-    $EDITOR $CONFIG_PATH/picom/picom.conf
-    ;;
-fish)
-    $EDITOR $CONFIG_PATH/private_fish/config.fish
-    ;;
-mimeapps)
-    $EDITOR $CONFIG_PATH/mimeapps.list
-    ;;
-External_Drives)
-    lf /media/
-    ;;
-nvim)
-    lf $CONFIG_PATH/nvim/
-    ;;
+# Separate the keys from their values, runs gum filter
+KEY=$(echo "$CONFIGS" | cut -d '=' -f 1 | gum filter $GUM_CONFIG)
 
-*)
-    echo "Usage: config.sh [i3wm|lf|kitty|picom|fish|mimeapps|External_Drives|nvim]"
-    ;;
-esac
+# Selects the value for the given key
+CHOICE=$(echo "$CONFIGS" | grep $KEY | cut -d '=' -f 2)
+
+# Strips CHOICE of quotation marks and executes
+eval "${CHOICE//\"/}"
+
