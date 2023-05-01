@@ -12,7 +12,7 @@ quickly hop into my different dot files, but keys can be
 assigned really any shell commands.
 
 ### Installation
-You must have Charmbracelet's "gum" installed along with go. Check out
+You must have Charmbracelet's "gum" installed. Check out
 https://github.com/charmbracelet/gum.
 It can be installed from source, or through
 the package manager of your choice.
